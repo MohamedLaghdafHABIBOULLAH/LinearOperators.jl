@@ -34,6 +34,19 @@ end
   end
 end
 
+@testset "Weak secant equation for DBFGS update" begin
+  for grad_fun in (:∇f, :∇g, ∇h)
+    grad = eval(grad_fun)
+    s = x1 - x0
+    y = grad(x1) - grad(x0)
+    B = DiagonalBFGS([1.0, 1.0, 1.0])
+    push!(B, s, y)
+    @test typeof(B * s) <: Vector{Float64}
+    @test abs(dot(s, B.d .* s) - dot(s, y)) <= 1e-10
+    # Test to check that push and * are working correctly
+  end
+end
+
 @testset "Hard coded test" begin
   Bref = Dict{Symbol, Dict{Any, Any}}()
   Bref[:∇f] = Dict{Any, Any}()
